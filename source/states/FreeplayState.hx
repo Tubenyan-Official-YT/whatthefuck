@@ -89,6 +89,7 @@ class FreeplayState extends MusicBeatState
 			freeplayUIGrp.add(btn);
 			diffButtons.push(btn);
 		}
+		freeplayUIGrp.updateHitbox(); // 버튼 add/remove 후 그룹 자체 히트박스도 실제 위치에 맞게 갱신
 	}
 	
 	override function create()
