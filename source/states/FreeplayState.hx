@@ -78,11 +78,12 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...Difficulty.list.length) {
 			var diffName:String = Paths.formatToSongPath(Difficulty.list[i]);
 			var isSelected:Bool = (i == curDifficulty);
-			// startButton.x는 이미 add() 때 그룹 오프셋이 적용된 절대좌표라서 x만 미리 빼서 상쇄시킴 (중복 오프셋 방지).
-			// btnY는 그룹 기준 순수 상대값이라 그대로 두면 add()에서 정상적으로 한 번 오프셋됨.
-			// i=0(맨 오른쪽 버튼)의 오른쪽 끝이 startButton의 리사이징된 오른쪽 끝과 맞도록 앵커.
-			var btn:FlxSprite = new FlxSprite(startButton.x + startButton.width - i * spacing - freeplayUIGrp.x, btnY);
+			var btn:FlxSprite = new FlxSprite(0, btnY);
 			btn.loadGraphic(Paths.image('freeplayDiff/$diffName-${isSelected ? "true" : "false"}'));
+			// btn.width는 loadGraphic 이후에만 알 수 있어서 로드 후 위치 계산.
+			// startButton.x는 add() 때 그룹 오프셋이 이미 적용된 절대좌표라서 x만 미리 빼서 상쇄(중복 오프셋 방지).
+			// i=0(맨 오른쪽 버튼)의 "오른쪽 끝"이 startButton의 리사이징된 오른쪽 끝과 맞도록 btn.width를 빼서 앵커.
+			btn.x = startButton.x + startButton.width - btn.width - i * spacing - freeplayUIGrp.x;
 			btn.antialiasing = ClientPrefs.data.antialiasing;
 			btn.scrollFactor.set();
 			btn.ID = i;
