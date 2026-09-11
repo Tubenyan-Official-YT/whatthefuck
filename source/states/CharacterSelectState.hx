@@ -152,7 +152,8 @@ class CharacterSelectState extends MusicBeatState
     
         FlxG.sound.play(Paths.sound('charSelect/' + name));
         charSprite.loadGraphic(Paths.image('charSelect/' + name + 'go'));
-        charSprite.screenCenter();
+        charSprite.screenCenter(X); // Y는 changeSelection()과 같은 공식 유지 (전체중앙정렬 시 위치 튐 방지)
+        charSprite.y = bg.y + (bg.height * 1 / 4) - (charSprite.height / 2);
 
         backend.WeekData.weeksList = [];
         backend.WeekData.weeksLoaded.clear();
