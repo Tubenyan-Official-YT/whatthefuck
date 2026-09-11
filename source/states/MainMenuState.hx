@@ -423,8 +423,8 @@ class MainMenuState extends MusicBeatState
 				{
 					for (memb in menuItems)
 					{
-						if (memb == leftItem || memb == rightItem || optionShit[memb.ID] == 'story_mode') FlxTween.tween(memb, {x: FlxG.width + memb.width + 50}, 2, {ease: FlxEase.quadOut});
-						else FlxTween.tween(memb, {x: bg.x - memb.width - 50}, 2, {ease: FlxEase.quadOut});
+						if (memb == leftItem || memb == rightItem || optionShit[memb.ID] == 'story_mode') FlxTween.tween(memb, {x: FlxG.width + memb.width + 50}, 2, {ease: FlxEase.cubeOut});
+						else FlxTween.tween(memb, {x: bg.x - memb.width - 50}, 2, {ease: FlxEase.cubeOut});
 					}
 				}
 			}
