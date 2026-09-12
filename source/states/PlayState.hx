@@ -310,6 +310,7 @@ class PlayState extends MusicBeatState
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		cropOverlay = false; // 게임플레이 화면은 오버레이로 안 자름
+		variables.set('downScroll', ClientPrefs.data.downScroll); // Lua에서 getVar('downScroll')로 스크롤 방향 읽게 동기화
 		camGame = initPsychCamera();
 		camHUD = new FlxCamera();
 		camOther = new FlxCamera();

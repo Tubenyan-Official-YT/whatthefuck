@@ -34,8 +34,21 @@ class GamatotoState extends MusicBeatState
 	// idle: 창 닫힌 상태, carousel: 모험/시간 선택중, status: 진행중/완료 표시
 	var uiState:String = "idle";
 
+	var camGamatoto:flixel.FlxCamera;
+
 	override function create()
 	{
+		cropOverlay = false; // 가마토토 화면은 오버레이로 안 자름
+		// 에디터류(ChartingState 등)처럼 cropOverlay=false일 때 카메라가 1개뿐이면
+		// FlxG.mouse.overlaps()가 카메라 참조를 못 찾아 NullObjectReference를 던짐.
+		// 그래서 카메라를 명시적으로 만들어 넘겨줌 (StageEditorState의 camHUD 패턴과 동일)
+		camGamatoto = initPsychCamera();
+		// initPsychCamera가 만든 카메라 하나뿐이면 FlxG.mouse.overlaps()가 깨지길래
+		// 에디터류(camHUD)처럼 카메라를 하나 더 추가해서 리스트를 2개 이상으로 유지
+		var dummyCam:flixel.FlxCamera = new flixel.FlxCamera();
+		dummyCam.bgColor.alpha = 0;
+		FlxG.cameras.add(dummyCam, false);
+
 		Gamatoto.init();
 
 		FlxG.mouse.visible = true;
@@ -150,7 +163,7 @@ class GamatotoState extends MusicBeatState
 		{
 			case "idle":
 				var clickedEntry:Bool = FlxG.mouse.justPressed
-					&& (FlxG.mouse.overlaps(catSprite) || FlxG.mouse.overlaps(promptText));
+					&& (FlxG.mouse.overlaps(catSprite, camGamatoto) || FlxG.mouse.overlaps(promptText, camGamatoto));
 				if (controls.ACCEPT || clickedEntry)
 				{
 					FlxG.sound.play(Paths.sound('confirmMenu'));
@@ -188,7 +201,7 @@ class GamatotoState extends MusicBeatState
 				{
 					for (i in 0...windowTexts.length)
 					{
-						if (FlxG.mouse.overlaps(windowTexts[i]))
+						if (FlxG.mouse.overlaps(windowTexts[i], camGamatoto))
 						{
 							curDuration = i;
 							startSelectedAdventure();
@@ -202,7 +215,7 @@ class GamatotoState extends MusicBeatState
 				if (Gamatoto.curAd.completed)
 				{
 					t.text = "탐험 완료!\n엔터: 보상받기";
-					if (controls.ACCEPT || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(t)))
+					if (controls.ACCEPT || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(t, camGamatoto)))
 					{
 						FlxG.sound.play(Paths.sound('confirmMenu'));
 						Gamatoto.claim();
