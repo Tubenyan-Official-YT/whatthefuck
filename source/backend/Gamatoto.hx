@@ -13,6 +13,9 @@ class Gamatoto
 	public static var curAd:Adventure;
 	public static var startTime:Float = 0;
 
+	// 언락된 모험 이름 목록. 기본값은 첫 모험만 (init()에서 비어있으면 채움)
+	public static var unlockedNames:Array<String> = [];
+
 	static var sv:FlxSave;
 	#if LUA_ALLOWED
 	static var gamatotoLua:FunkinLua;
@@ -44,6 +47,21 @@ class Gamatoto
 		curAd.completed = false;
 		startTime = Clock.now();
 		save();
+	}
+
+	public static function isUnlocked(name:String):Bool
+	{
+		return unlockedNames.indexOf(name) != -1;
+	}
+
+	// Lua에서 unlockGamatoto(name) 함수로 호출됨
+	public static function unlock(name:String):Void
+	{
+		if (!isUnlocked(name))
+		{
+			unlockedNames.push(name);
+			save();
+		}
 	}
 
 	// 남은시간(초). 완료됐으면 0
@@ -104,6 +122,7 @@ class Gamatoto
 		sv.data.gamatotoName = curAd != null ? curAd.name : null;
 		sv.data.gamatotoTime = curAd != null ? curAd.time : null;
 		sv.data.gamatotoStart = startTime;
+		sv.data.gamatotoUnlocked = unlockedNames.join(',');
 		sv.flush();
 	}
 
@@ -115,5 +134,7 @@ class Gamatoto
 			curAd = new Adventure(sv.data.gamatotoName, sv.data.gamatotoTime);
 			startTime = sv.data.gamatotoStart;
 		}
+		if (sv.data.gamatotoUnlocked != null && sv.data.gamatotoUnlocked != '')
+			unlockedNames = sv.data.gamatotoUnlocked.split(',');
 	}
 }

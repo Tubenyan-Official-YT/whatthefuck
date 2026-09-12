@@ -6,6 +6,7 @@ import backend.Highscore;
 import backend.Song;
 import backend.EnergySystem;
 import backend.Locking;
+import backend.Gamatoto;
 
 import openfl.Lib;
 import openfl.utils.Assets;
@@ -283,6 +284,11 @@ class FunkinLua {
 			}
 			#end
 			return false;
+		});
+
+		Lua_helper.add_callback(lua, "unlockGamatoto", function(name:String) {
+			Gamatoto.unlock(name);
+			return true;
 		});
 
 		Lua_helper.add_callback(lua, "setVar", function(varName:String, value:Dynamic) {
