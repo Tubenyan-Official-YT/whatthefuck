@@ -13,6 +13,7 @@ import openfl.utils.AssetType;
  * 가마토토 탐험 화면.
  * TODO: adventureNames는 임시 placeholder임. 실제 모험 목록으로 교체 필요.
  * 가마토토 관련 이미지는 전부 images/gamatoto/ 안에 위치 (없으면 자동으로 대체 그래픽 사용).
+ * 언락: Gamatoto.unlockedNames에 이름 저장됨. Lua에서 unlockGamatoto(name) 함수로 풀어줌.
  */
 class GamatotoState extends MusicBeatState
 {
@@ -30,26 +31,25 @@ class GamatotoState extends MusicBeatState
 	var promptText:FlxText; // TODO: 임시 말풍선 텍스트, 나중에 실제 말풍선 그래픽으로 교체
 	var curWindow:Window;
 	var windowTexts:Array<FlxText> = [];
+	var windowTitle:FlxText; // 창 위쪽에 모험 이름 표시 (창 이미지는 통일해서 씀)
 
 	// idle: 창 닫힌 상태, carousel: 모험/시간 선택중, status: 진행중/완료 표시
 	var uiState:String = "idle";
 
-	var camGamatoto:flixel.FlxCamera;
+	// 가마토토 화면엔 곡이 안 돌아서 Conductor 기반 beatHit()이 이상하게 튐(남은 bpm 값 때문에 트르르르 떨림).
+	// 그래서 곡이랑 무관하게 그냥 타이머로 통통 튀게 함
+	var idleBopTimer:Float = 0;
+	static inline var IDLE_BOP_INTERVAL:Float = 0.5;
 
 	override function create()
 	{
 		cropOverlay = false; // 가마토토 화면은 오버레이로 안 자름
-		// 에디터류(ChartingState 등)처럼 cropOverlay=false일 때 카메라가 1개뿐이면
-		// FlxG.mouse.overlaps()가 카메라 참조를 못 찾아 NullObjectReference를 던짐.
-		// 그래서 카메라를 명시적으로 만들어 넘겨줌 (StageEditorState의 camHUD 패턴과 동일)
-		camGamatoto = initPsychCamera();
-		// initPsychCamera가 만든 카메라 하나뿐이면 FlxG.mouse.overlaps()가 깨지길래
-		// 에디터류(camHUD)처럼 카메라를 하나 더 추가해서 리스트를 2개 이상으로 유지
-		var dummyCam:flixel.FlxCamera = new flixel.FlxCamera();
-		dummyCam.bgColor.alpha = 0;
-		FlxG.cameras.add(dummyCam, false);
 
 		Gamatoto.init();
+
+		// 첫 실행이면 첫 모험만 언락
+		if (Gamatoto.unlockedNames.length == 0)
+			Gamatoto.unlock(adventureNames[0]);
 
 		FlxG.mouse.visible = true;
 
@@ -71,7 +71,7 @@ class GamatotoState extends MusicBeatState
 		if (Paths.fileExists('images/gamatoto/cat.png', IMAGE))
 		{
 			catSprite.frames = Paths.getSparrowAtlas('gamatoto/cat');
-			catSprite.animation.addByPrefix('idle', 'idle', 24, true);
+			catSprite.animation.addByPrefix('idle', 'idle', 12, false);
 			catSprite.animation.play('idle');
 			catSprite.antialiasing = ClientPrefs.data.antialiasing;
 		}
@@ -82,7 +82,20 @@ class GamatotoState extends MusicBeatState
 		catSprite.screenCenter();
 		add(catSprite);
 
+		promptText = new FlxText(0, catSprite.y - 60, FlxG.width, "가마토토 출발!", 28);
+		promptText.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
+		add(promptText);
+
 		super.create();
+	}
+
+	// FlxG.mouse.overlaps(obj)는 카메라 쪼가리에서 널참조 나길래
+	// FlxPointer 안 타는 좌표 직접비교로 완전히 회피
+	function mouseOverlaps(obj:FlxSprite):Bool
+	{
+		if (obj == null) return false;
+		return FlxG.mouse.x >= obj.x && FlxG.mouse.x <= obj.x + obj.width
+			&& FlxG.mouse.y >= obj.y && FlxG.mouse.y <= obj.y + obj.height;
 	}
 
 	function openWindow()
@@ -99,29 +112,51 @@ class GamatotoState extends MusicBeatState
 		}
 	}
 
+	// 창 이미지는 gamatoto/window 하나로 통일. 이름은 위쪽에 텍스트로 표시
 	function openAdventureWindow()
 	{
 		closeWindow(false);
 
-		curWindow = new Window('gamatoto/' + adventureNames[curAdIndex], 0, true, true);
+		var name:String = adventureNames[curAdIndex];
+		var locked:Bool = !Gamatoto.isUnlocked(name);
+
+		curWindow = new Window('gamatoto/window', 0, true, true);
 		add(curWindow);
 
-		for (i in 0...durationLabels.length)
+		windowTitle = new FlxText(0, 20, 300, name, 28);
+		windowTitle.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
+		curWindow.addItemAt(0, 20, windowTitle);
+
+		if (locked)
 		{
-			var t:FlxText = new FlxText(0, 0, 200, durationLabels[i], 24);
-			t.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
-			curWindow.addItemAt(50, 60 + i * 50, t);
-			windowTexts.push(t);
+			var lockedText:FlxText = new FlxText(0, 100, 300, "아직 잠겨있음", 24);
+			lockedText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.GRAY, CENTER);
+			curWindow.addItemAt(0, 100, lockedText);
+			windowTexts.push(lockedText);
 		}
-		updateDurationHighlight();
+		else
+		{
+			for (i in 0...durationLabels.length)
+			{
+				var t:FlxText = new FlxText(0, 0, 200, durationLabels[i], 24);
+				t.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
+				curWindow.addItemAt(50, 60 + i * 50, t);
+				windowTexts.push(t);
+			}
+			updateDurationHighlight();
+		}
 	}
 
 	function openStatusWindow()
 	{
 		closeWindow(false);
 
-		curWindow = new Window('gamatoto/' + Gamatoto.curAd.name, 0, true, true);
+		curWindow = new Window('gamatoto/window', 0, true, true);
 		add(curWindow);
+
+		windowTitle = new FlxText(0, 20, 300, Gamatoto.curAd.name, 28);
+		windowTitle.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
+		curWindow.addItemAt(0, 20, windowTitle);
 
 		var t:FlxText = new FlxText(0, 0, 300, "", 24);
 		t.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
@@ -143,30 +178,33 @@ class GamatotoState extends MusicBeatState
 			curWindow.destroy();
 			curWindow = null;
 		}
+		windowTitle = null;
 		windowTexts = [];
 		if (fullClose) uiState = "idle";
 	}
 
 	function startSelectedAdventure()
 	{
+		var name:String = adventureNames[curAdIndex];
+		if (!Gamatoto.isUnlocked(name)) return; // 잠긴 모험은 시작 불가
+
 		FlxG.sound.play(Paths.sound('confirmMenu'));
-		var ad:Adventure = new Adventure(adventureNames[curAdIndex], durations[curDuration]);
+		var ad:Adventure = new Adventure(name, durations[curDuration]);
+		ad.isLocked = false;
 		Gamatoto.startAdventure(ad);
 		closeWindow();
-	}
-
-	// FlxG.mouse.overlaps(obj)는 카메라 쪼가리에서 아직도 널참조 나길래
-	// 아예 FlxPointer 쪼가리 안 타는 FlxG.mouse.x/y 직접비교로 완전히 회피
-	function mouseOverlaps(obj:FlxSprite):Bool
-	{
-		if (obj == null) return false;
-		return FlxG.mouse.x >= obj.x && FlxG.mouse.x <= obj.x + obj.width
-			&& FlxG.mouse.y >= obj.y && FlxG.mouse.y <= obj.y + obj.height;
 	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+
+		idleBopTimer += elapsed;
+		if (idleBopTimer >= IDLE_BOP_INTERVAL)
+		{
+			idleBopTimer = 0;
+			catSprite.animation.play('idle', true);
+		}
 
 		switch (uiState)
 		{
@@ -193,9 +231,12 @@ class GamatotoState extends MusicBeatState
 				}
 				else if (controls.UI_UP_P || controls.UI_DOWN_P)
 				{
-					curDuration = FlxMath.wrap(curDuration + (controls.UI_UP_P ? -1 : 1), 0, durationLabels.length - 1);
-					FlxG.sound.play(Paths.sound('scrollMenu'));
-					updateDurationHighlight();
+					if (Gamatoto.isUnlocked(adventureNames[curAdIndex]))
+					{
+						curDuration = FlxMath.wrap(curDuration + (controls.UI_UP_P ? -1 : 1), 0, durationLabels.length - 1);
+						FlxG.sound.play(Paths.sound('scrollMenu'));
+						updateDurationHighlight();
+					}
 				}
 				else if (controls.ACCEPT)
 				{
@@ -206,7 +247,7 @@ class GamatotoState extends MusicBeatState
 					FlxG.sound.play(Paths.sound('cancelMenu'));
 					closeWindow();
 				}
-				else if (FlxG.mouse.justPressed)
+				else if (FlxG.mouse.justPressed && Gamatoto.isUnlocked(adventureNames[curAdIndex]))
 				{
 					for (i in 0...windowTexts.length)
 					{
@@ -234,7 +275,7 @@ class GamatotoState extends MusicBeatState
 				else
 				{
 					var remain:Float = Gamatoto.getRemaining();
-					t.text = "남은시간: " + Std.int(remain/1000) + "분";
+					t.text = "남은시간: " + Std.int(remain / 60) + "분";
 					if (remain <= 0) Gamatoto.init();
 				}
 
