@@ -36,10 +36,6 @@ class GamatotoState extends MusicBeatState
 	// idle: 창 닫힌 상태, carousel: 모험/시간 선택중, status: 진행중/완료 표시
 	var uiState:String = "idle";
 
-	// 가마토토 화면엔 곡이 안 돌아서 Conductor 기반 beatHit()이 이상하게 튐(남은 bpm 값 때문에 트르르르 떨림).
-	// 그래서 곡이랑 무관하게 그냥 타이머로 통통 튀게 함
-	var idleBopTimer:Float = 0;
-	static inline var IDLE_BOP_INTERVAL:Float = 0.5;
 
 	override function create()
 	{
@@ -96,6 +92,12 @@ class GamatotoState extends MusicBeatState
 		if (obj == null) return false;
 		return FlxG.mouse.x >= obj.x && FlxG.mouse.x <= obj.x + obj.width
 			&& FlxG.mouse.y >= obj.y && FlxG.mouse.y <= obj.y + obj.height;
+	}
+
+	override function beatHit()
+	{
+		super.beatHit();
+		catSprite.animation.play('idle', true);
 	}
 
 	function openWindow()
@@ -198,13 +200,6 @@ class GamatotoState extends MusicBeatState
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-
-		idleBopTimer += elapsed;
-		if (idleBopTimer >= IDLE_BOP_INTERVAL)
-		{
-			idleBopTimer = 0;
-			catSprite.animation.play('idle', true);
-		}
 
 		switch (uiState)
 		{
