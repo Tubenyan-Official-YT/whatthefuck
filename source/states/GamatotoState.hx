@@ -36,6 +36,8 @@ class GamatotoState extends MusicBeatState
 
 	override function create()
 	{
+		cropOverlay = false; // 가마토토 화면은 오버레이로 안 자름
+
 		Gamatoto.init();
 
 		FlxG.mouse.visible = true;
