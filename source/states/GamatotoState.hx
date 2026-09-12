@@ -8,6 +8,7 @@ import flixel.util.FlxColor;
 import flixel.math.FlxMath;
 import objects.Window;
 import openfl.utils.AssetType;
+import flixel.text.FlxTextBorderStyle;
 
 /**
  * 가마토토 탐험 화면.
@@ -28,7 +29,6 @@ class GamatotoState extends MusicBeatState
 	var curDuration:Int = 0;
 
 	var catSprite:FlxSprite;
-	var promptText:FlxText; // TODO: 임시 말풍선 텍스트, 나중에 실제 말풍선 그래픽으로 교체
 	var curWindow:Window;
 	var windowTexts:Array<FlxText> = [];
 	var windowTitle:FlxText; // 창 위쪽에 모험 이름 표시 (창 이미지는 통일해서 씀)
@@ -78,10 +78,6 @@ class GamatotoState extends MusicBeatState
 		catSprite.screenCenter();
 		add(catSprite);
 
-		promptText = new FlxText(0, catSprite.y - 60, FlxG.width, "가마토토 출발!", 28);
-		promptText.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
-		add(promptText);
-
 		super.create();
 	}
 
@@ -127,12 +123,14 @@ class GamatotoState extends MusicBeatState
 
 		windowTitle = new FlxText(0, 20, 300, name, 28);
 		windowTitle.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
-		curWindow.addItemAt(0, 20, windowTitle);
+		windowTitle.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
+		curWindow.addItemAt(0, 10, windowTitle);
 
 		if (locked)
 		{
 			var lockedText:FlxText = new FlxText(0, 100, 300, "아직 잠겨있음", 24);
 			lockedText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.GRAY, CENTER);
+			lockedText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
 			curWindow.addItemAt(0, 100, lockedText);
 			windowTexts.push(lockedText);
 		}
@@ -142,6 +140,7 @@ class GamatotoState extends MusicBeatState
 			{
 				var t:FlxText = new FlxText(0, 0, 200, durationLabels[i], 24);
 				t.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
+				t.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
 				curWindow.addItemAt(50, 60 + i * 50, t);
 				windowTexts.push(t);
 			}
@@ -162,7 +161,8 @@ class GamatotoState extends MusicBeatState
 
 		var t:FlxText = new FlxText(0, 0, 300, "", 24);
 		t.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
-		curWindow.addItemAt(30, 80, t);
+		t.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
+		curWindow.addItem("screenCenter", t);
 		windowTexts.push(t);
 	}
 
