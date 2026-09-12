@@ -1,5 +1,6 @@
 package objects;
 import backend.EasyJson;
+import openfl.utils.AssetType;
 
 class Window extends FlxSpriteGroup {
 	// 변수들임.
@@ -28,7 +29,11 @@ class Window extends FlxSpriteGroup {
 			add(dimBG);
 		}
 		
-		mainWin = new FlxSprite(0,0).loadGraphic(Paths.image(winImage));
+		// 이미지 없으면 검은 네모 하나로 대체
+		if (Paths.fileExists('images/${winImage}.png', IMAGE))
+			mainWin = new FlxSprite(0, 0).loadGraphic(Paths.image(winImage));
+		else
+			mainWin = new FlxSprite(0, 0).makeGraphic(300, 300, FlxColor.BLACK);
 		mainWin.screenCenter();
 		mainWin.antialiasing = ClientPrefs.data.antialiasing;
 		mainWin.updateHitbox();
@@ -93,6 +98,13 @@ class Window extends FlxSpriteGroup {
 			sprite.x = pos[0];
 			sprite.y = pos[1];
 		}
+	}
+
+	// 포지션 JSON(posMap) 없이, mainWin 기준 상대좌표로 바로 배치 (가마토토 창처럼 모험마다 배경이 바뀌는 경우용)
+	public function addItemAt(x:Float, y:Float, sprite:FlxSprite) {
+		contents.add(sprite);
+		sprite.x = mainWin.x + x;
+		sprite.y = mainWin.y + y + offsetT;
 	}
 	
 	override function update(elapsed:Float) {
