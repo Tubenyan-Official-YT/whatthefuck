@@ -2,6 +2,7 @@ package states;
 
 import backend.Gamatoto;
 import backend.Adventure;
+import backend.Conductor;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
@@ -199,6 +200,11 @@ class GamatotoState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		// 메인메뉴 음악(freakyMenu)이 계속 흐르는 중이라 그거 기준으로 Conductor 갱신
+		// (PlayState 밖에서는 Conductor.songPosition이 자동으로 안 흐름)
+		if (FlxG.sound.music != null && FlxG.sound.music.playing)
+			Conductor.songPosition = FlxG.sound.music.time;
+
 		super.update(elapsed);
 
 		switch (uiState)
