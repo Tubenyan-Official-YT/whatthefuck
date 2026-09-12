@@ -16,7 +16,7 @@ import openfl.utils.AssetType;
  */
 class GamatotoState extends MusicBeatState
 {
-	var adventureNames:Array<String> = ["냥랜드", "고양이빌딩", "우주모험"];
+	var adventureNames:Array<String> = ["평화 초원", "쿵후 왕국", "사바의 사막"];
 	var durations:Array<Float> = [3600, 3600 * 3, 3600 * 6]; // 1h, 3h, 6h
 	var durationLabels:Array<String> = ["1시간", "3시간", "6시간"];
 
@@ -36,8 +36,6 @@ class GamatotoState extends MusicBeatState
 
 	override function create()
 	{
-		cropOverlay = false; // 가마토토 화면은 오버레이로 안 자름
-
 		Gamatoto.init();
 
 		FlxG.mouse.visible = true;
@@ -70,11 +68,6 @@ class GamatotoState extends MusicBeatState
 		}
 		catSprite.screenCenter();
 		add(catSprite);
-
-		// 임시 말풍선 텍스트: 누르면 창 열림 (나중에 실제 말풍선 그래픽으로 교체 예정)
-		promptText = new FlxText(0, catSprite.y - 60, FlxG.width, "가마토토 출발!", 28);
-		promptText.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
-		add(promptText);
 
 		super.create();
 	}
@@ -219,7 +212,7 @@ class GamatotoState extends MusicBeatState
 				else
 				{
 					var remain:Float = Gamatoto.getRemaining();
-					t.text = "남은시간: " + Std.int(remain) + "초";
+					t.text = "남은시간: " + Std.int(remain/1000) + "분";
 					if (remain <= 0) Gamatoto.init();
 				}
 
