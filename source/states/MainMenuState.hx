@@ -177,7 +177,7 @@ class MainMenuState extends MusicBeatState
 		}
 		#end
 
-		menuItems.y += 30;
+		menuItems.y += 130;
 	}
 
 	function createMenuItem(name:String, x:Float, y:Float):FlxSprite
