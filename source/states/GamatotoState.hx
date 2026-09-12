@@ -42,6 +42,10 @@ class GamatotoState extends MusicBeatState
 	{
 		cropOverlay = false; // 가마토토 화면은 오버레이로 안 자름
 
+		// 예전에 플레이한 곡의 bpmChangeMap이 static이라 그대로 남아있어서
+		// 메인메뉴 곡 시간이랑 안 맞는 엉뚱한 stepCrochet이 나옴 -> 여기서 초기화
+		Conductor.bpmChangeMap = [];
+
 		Gamatoto.init();
 
 		// 첫 실행이면 첫 모험만 언락
