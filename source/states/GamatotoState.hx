@@ -40,10 +40,10 @@ class GamatotoState extends MusicBeatState
 	{
 		cropOverlay = false; // 가마토토 화면은 오버레이로 안 자름
 		// 에디터류(ChartingState 등)처럼 cropOverlay=false일 때 카메라가 1개뿐이면
-		// FlxG.mouse.overlaps()가 카메라 참조를 못 찾아 NullObjectReference를 던짐.
+		// mouseOverlaps()가 카메라 참조를 못 찾아 NullObjectReference를 던짐.
 		// 그래서 카메라를 명시적으로 만들어 넘겨줌 (StageEditorState의 camHUD 패턴과 동일)
 		camGamatoto = initPsychCamera();
-		// initPsychCamera가 만든 카메라 하나뿐이면 FlxG.mouse.overlaps()가 깨지길래
+		// initPsychCamera가 만든 카메라 하나뿐이면 mouseOverlaps()가 깨지길래
 		// 에디터류(camHUD)처럼 카메라를 하나 더 추가해서 리스트를 2개 이상으로 유지
 		var dummyCam:flixel.FlxCamera = new flixel.FlxCamera();
 		dummyCam.bgColor.alpha = 0;
@@ -71,7 +71,7 @@ class GamatotoState extends MusicBeatState
 		if (Paths.fileExists('images/gamatoto/cat.png', IMAGE))
 		{
 			catSprite.frames = Paths.getSparrowAtlas('gamatoto/cat');
-			catSprite.animation.addByPrefix('idle', 'idle', 24, true);
+			catSprite.animation.addByPrefix('idle', 'idle', 12, false);
 			catSprite.animation.play('idle');
 			catSprite.antialiasing = ClientPrefs.data.antialiasing;
 		}
@@ -154,6 +154,19 @@ class GamatotoState extends MusicBeatState
 		Gamatoto.startAdventure(ad);
 		closeWindow();
 	}
+	
+	override function beatHit()
+	{
+    	super.beatHit();
+    	catSprite.animation.play('idle', true);
+	}
+	function mouseOverlaps(obj:FlxSprite):Bool
+	{
+    	if (obj == null) return false;
+    	return FlxG.mouse.x >= obj.x && FlxG.mouse.x <= obj.x + obj.width
+        	&& FlxG.mouse.y >= obj.y && FlxG.mouse.y <= obj.y + obj.height;
+	}
+
 
 	override function update(elapsed:Float)
 	{
@@ -163,7 +176,7 @@ class GamatotoState extends MusicBeatState
 		{
 			case "idle":
 				var clickedEntry:Bool = FlxG.mouse.justPressed
-					&& (FlxG.mouse.overlaps(catSprite, camGamatoto) || FlxG.mouse.overlaps(promptText, camGamatoto));
+					&& (mouseOverlaps(catSprite, camGamatoto) || mouseOverlaps(promptText, camGamatoto));
 				if (controls.ACCEPT || clickedEntry)
 				{
 					FlxG.sound.play(Paths.sound('confirmMenu'));
@@ -201,7 +214,7 @@ class GamatotoState extends MusicBeatState
 				{
 					for (i in 0...windowTexts.length)
 					{
-						if (FlxG.mouse.overlaps(windowTexts[i], camGamatoto))
+						if (mouseOverlaps(windowTexts[i], camGamatoto))
 						{
 							curDuration = i;
 							startSelectedAdventure();
@@ -215,7 +228,7 @@ class GamatotoState extends MusicBeatState
 				if (Gamatoto.curAd.completed)
 				{
 					t.text = "탐험 완료!\n엔터: 보상받기";
-					if (controls.ACCEPT || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(t, camGamatoto)))
+					if (controls.ACCEPT || (FlxG.mouse.justPressed && mouseOverlaps(t, camGamatoto)))
 					{
 						FlxG.sound.play(Paths.sound('confirmMenu'));
 						Gamatoto.claim();
