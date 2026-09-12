@@ -9,8 +9,8 @@ import substates.StoryMenuSubState;
 import backend.WeekData;
 import backend.Locking;
 
-import flixel.FlxEase;
-import flixel.FlxTween;
+import flixel.tweens.FlxEase;
+import flixel.tweens.FlxTween;
 
 enum MainMenuColumn {
 	LEFT;
@@ -39,13 +39,11 @@ class MainMenuState extends MusicBeatState
 
 	var leftOption:String = #if ACHIEVEMENTS_ALLOWED 'mission' #else null #end;
 	var rightOption:String = 'options';
-
+	
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
 	var bg:FlxSprite;
-	var itemTargetY:Array<Int> = [];
-	var itemTargetX:Int;
 
 	static var showOutdatedWarning:Bool = true;
 	override function create()
@@ -139,13 +137,13 @@ class MainMenuState extends MusicBeatState
 		menuItems.scale.set(0.75, 0.75);
 		for (memb in menuItems)
 		{
-			memb.updateHitbox();
-			itemTargetX = memb.x;
-			itemTargetY.push(memb.y);
-			for (targetY in itemTargetY) {
-				FlxTween.tween(memb, {x: itemTargetX, y: targetY}, 1.0, {ease: FlxEase.cubeOut});
-			}
+    		memb.updateHitbox();
+    		var targetX:Float = memb.x;
+    		var targetY:Float = memb.y;
+    		memb.x -= 300; // 여기서 옆으로 밀어놓기
+    		FlxTween.tween(memb, {x: targetX, y: targetY}, 1.0, {ease: FlxEase.cubeOut});
 		}
+
 		
 		var psychVer:FlxText = new FlxText(12, FlxG.height - 66, 0, Language.getPhrase('psychVer','Legend Engine Version: ') + psychEngineVersion, 12);
 		psychVer.scrollFactor.set();
