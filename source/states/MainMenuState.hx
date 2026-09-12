@@ -135,6 +135,7 @@ class MainMenuState extends MusicBeatState
 		}
 
 		menuItems.scale.set(0.75, 0.75);
+		menuItems.y += 40;
 		for (memb in menuItems)
 		{
     		memb.updateHitbox();
@@ -176,8 +177,6 @@ class MainMenuState extends MusicBeatState
 			openSubState(new substates.OutdatedSubState());
 		}
 		#end
-
-		menuItems.y += 130;
 	}
 
 	function createMenuItem(name:String, x:Float, y:Float):FlxSprite
