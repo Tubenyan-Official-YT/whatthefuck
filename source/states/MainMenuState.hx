@@ -9,6 +9,9 @@ import substates.StoryMenuSubState;
 import backend.WeekData;
 import backend.Locking;
 
+import flixel.FlxEase;
+import flixel.FlxTween;
+
 enum MainMenuColumn {
 	LEFT;
 	CENTER;
@@ -41,6 +44,8 @@ class MainMenuState extends MusicBeatState
 	var camFollow:FlxObject;
 
 	var bg:FlxSprite;
+	var itemTargetY:Array<Int> = [];
+	var itemTargetX:Int;
 
 	static var showOutdatedWarning:Bool = true;
 	override function create()
@@ -135,8 +140,13 @@ class MainMenuState extends MusicBeatState
 		for (memb in menuItems)
 		{
 			memb.updateHitbox();
+			itemTargetX = memb.x;
+			itemTargetY.push(memb.y);
+			for (targetY in itemTargetY) {
+				FlxTween.tween(memb, {x: itemTargetX, y: targetY}, 1.0, {ease: FlxEase.cubeOut});
+			}
 		}
-
+		
 		var psychVer:FlxText = new FlxText(12, FlxG.height - 66, 0, Language.getPhrase('psychVer','Legend Engine Version: ') + psychEngineVersion, 12);
 		psychVer.scrollFactor.set();
 		psychVer.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
