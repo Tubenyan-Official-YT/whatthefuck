@@ -8,7 +8,7 @@ import flixel.util.FlxColor;
 import flixel.math.FlxMath;
 import objects.Window;
 import openfl.utils.AssetType;
-import flixel.text.FlxTextBorderStyle;
+import flixel.text.FlxText.FlxTextBorderStyle;
 
 /**
  * 가마토토 탐험 화면.
@@ -205,7 +205,7 @@ class GamatotoState extends MusicBeatState
 		{
 			case "idle":
 				var clickedEntry:Bool = FlxG.mouse.justPressed
-					&& (mouseOverlaps(catSprite) || mouseOverlaps(promptText));
+					&& (mouseOverlaps(catSprite));
 				if (controls.ACCEPT || clickedEntry)
 				{
 					FlxG.sound.play(Paths.sound('confirmMenu'));
