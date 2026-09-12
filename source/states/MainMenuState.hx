@@ -33,6 +33,7 @@ class MainMenuState extends MusicBeatState
 	var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
+		'gamatoto',
 		#if MODS_ALLOWED 'charselect', #end
 		'credits'
 	];
@@ -112,7 +113,7 @@ class MainMenuState extends MusicBeatState
 		{
 			var item:FlxSprite = createMenuItem(option, 0, (num * 100) + 30);
 			item.ID = num;
-			if (option == 'story_mode' || option == 'freeplay' || option == 'charselect' || option == 'credits')
+			if (option == 'story_mode' || option == 'freeplay' || option == 'gamatoto' || option == 'charselect' || option == 'credits')
 			{
         		item.y -= 15;
     		}
@@ -183,20 +184,22 @@ class MainMenuState extends MusicBeatState
 	{
 		var menuItem:FlxSprite = new FlxSprite(x, y);
 		menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_$name');
-		if (menuItem.frames == null) // 아틀라스 없으면 안 띄우기
+		if (menuItem.frames == null) // 아틀라스 없으면 검은 네모로 대체 (여전히 선택/클릭은 가능)
 		{
 			FlxG.log.error('MainMenu: "menu_$name" 아틀라스를 찾을 수 없음');
-			return menuItem;
+			menuItem.makeGraphic(300, 90, FlxColor.BLACK);
 		}
-		menuItem.animation.addByPrefix('idle', '$name idle', 24, true);
-		menuItem.animation.addByPrefix('selected', '$name selected', 24, true);
-		menuItem.animation.play('idle');
+		else
+		{
+			menuItem.animation.addByPrefix('idle', '$name idle', 24, true);
+			menuItem.animation.addByPrefix('selected', '$name selected', 24, true);
+			menuItem.animation.play('idle');
+		}
 		menuItem.updateHitbox();
 
 		menuItem.antialiasing = ClientPrefs.data.antialiasing;
 		menuItem.scrollFactor.set();
-		if (menuItem.frames != null)
-			menuItems.add(menuItem);
+		menuItems.add(menuItem);
 		return menuItem;
 	}
 
@@ -402,6 +405,9 @@ class MainMenuState extends MusicBeatState
 							MusicBeatState.switchState(new AchievementsMenuState());
 						}
 					#end
+
+					case 'gamatoto':
+						MusicBeatState.switchState(new GamatotoState());
 
 					case 'credits':
 						MusicBeatState.switchState(new CreditsState());
