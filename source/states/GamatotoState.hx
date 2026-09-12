@@ -27,6 +27,7 @@ class GamatotoState extends MusicBeatState
 	var curDuration:Int = 0;
 
 	var catSprite:FlxSprite;
+	var promptText:FlxText; // TODO: 임시 말풍선 텍스트, 나중에 실제 말풍선 그래픽으로 교체
 	var curWindow:Window;
 	var windowTexts:Array<FlxText> = [];
 
@@ -67,6 +68,11 @@ class GamatotoState extends MusicBeatState
 		}
 		catSprite.screenCenter();
 		add(catSprite);
+
+		// 임시 말풍선 텍스트: 누르면 창 열림 (나중에 실제 말풍선 그래픽으로 교체 예정)
+		promptText = new FlxText(0, catSprite.y - 60, FlxG.width, "가마토토 출발!", 28);
+		promptText.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
+		add(promptText);
 
 		super.create();
 	}
@@ -148,7 +154,9 @@ class GamatotoState extends MusicBeatState
 		switch (uiState)
 		{
 			case "idle":
-				if (controls.ACCEPT || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(catSprite)))
+				var clickedEntry:Bool = FlxG.mouse.justPressed
+					&& (FlxG.mouse.overlaps(catSprite) || FlxG.mouse.overlaps(promptText));
+				if (controls.ACCEPT || clickedEntry)
 				{
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 					openWindow();
