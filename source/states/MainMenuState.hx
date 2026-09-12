@@ -141,7 +141,7 @@ class MainMenuState extends MusicBeatState
     		var targetX:Float = memb.x;
     		var targetY:Float = memb.y;
     		memb.x -= 300; // 여기서 옆으로 밀어놓기
-    		FlxTween.tween(memb, {x: targetX, y: targetY}, 1.0, {ease: FlxEase.cubeOut});
+    		FlxTween.tween(memb, {x: targetX, y: targetY}, 1.0, {ease: FlxEase.backOut});
 		}
 
 		
@@ -431,7 +431,7 @@ class MainMenuState extends MusicBeatState
 				{
 					for (memb in menuItems)
 					{
-						if (memb == leftItem || memb == rightItem || optionShit[memb.ID] == 'story_mode') FlxTween.tween(memb, {x: FlxG.width + memb.width + 50}, 2, {ease: FlxEase.cubeOut});
+						if (memb == leftItem || memb == rightItem || optionShit[memb.ID] == 'story_mode') FlxTween.tween(memb, {x: FlxG.width + memb.width + 50}, 2, {ease: FlxEase.circOut});
 						else FlxTween.tween(memb, {x: bg.x - memb.width - 50}, 2, {ease: FlxEase.cubeOut});
 					}
 				}
