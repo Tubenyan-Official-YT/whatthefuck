@@ -2,6 +2,7 @@ package states;
 
 import backend.WeekData;
 import backend.EnergySystem;
+import backend.Clock;
 import backend.Locking;
 
 import flixel.input.keyboard.FlxKey;
@@ -79,6 +80,7 @@ class TitleState extends MusicBeatState
 			ClientPrefs.loadPrefs();
 			Language.reloadPhrases();
 			EnergySystem.init();
+			Clock.init();
 			Locking.init();
 		}
 

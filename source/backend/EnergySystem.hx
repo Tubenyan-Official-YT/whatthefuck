@@ -30,15 +30,14 @@ class EnergySystem
 
     public static function calculateEnergy():Void
     {
-        var now = Date.now().getTime() / 1000;
         if (currentEnergy >= maxEnergy) {
-            lastSaveTime = now;
+            lastSaveTime = Clock.now();
             return;
         }
-        var elapsed = now - lastSaveTime;
+        var elapsed = Clock.elapsedSince(lastSaveTime);
         if (elapsed < givingSec) return;
-        
-        var cycles:Int = Std.int(elapsed / givingSec);
+
+        var cycles:Int = Clock.getCycles(elapsed, givingSec);
 
         currentEnergy += cycles * addEnergy;
         if (currentEnergy > maxEnergy) currentEnergy = maxEnergy; // 최대치 제한
@@ -58,9 +57,9 @@ class EnergySystem
         if (FlxG.save.data.givingSec != null) givingSec = FlxG.save.data.givingSec;
 
         if (FlxG.save.data.leaderShip != null) leaderShip = FlxG.save.data.leaderShip;
-        
+
         if (FlxG.save.data.lastSaveTime != null) lastSaveTime = FlxG.save.data.lastSaveTime;
-        else lastSaveTime = Date.now().getTime() / 1000;
+        else lastSaveTime = Clock.now();
     }
 
     public static function save():Void
@@ -96,8 +95,8 @@ class EnergySystem
                 currentEnergy += addEnergy;
                 if (currentEnergy > maxEnergy) currentEnergy = maxEnergy;
             }
-            timer = 0; 
-            lastSaveTime = Date.now().getTime() / 1000; 
+            timer = 0;
+            lastSaveTime = Clock.now();
             save();
         }
     }
