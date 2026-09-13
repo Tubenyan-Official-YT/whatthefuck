@@ -130,10 +130,12 @@ class GamatotoState extends MusicBeatState
 		windowTitle.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
 		windowTitle.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
 		curWindow.addItemAt(0, 10, windowTitle);
+		windowTitle.antialiasing = ClientPrefs.data.antialiasing;
 
 		if (locked)
 		{
 			var lockedText:FlxText = new FlxText(0, 100, 300, "아직 잠겨있음", 24);
+			lockedText.antialiasing = ClientPrefs.data.antialiasing;
 			lockedText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.GRAY, CENTER);
 			lockedText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
 			curWindow.addItemAt(0, 100, lockedText);
@@ -144,6 +146,7 @@ class GamatotoState extends MusicBeatState
 			for (i in 0...durationLabels.length)
 			{
 				var t:FlxText = new FlxText(0, 0, 200, durationLabels[i], 24);
+				t.antialiasing = ClientPrefs.data.antialiasing;
 				t.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
 				t.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
 				curWindow.addItemAt(50, 60 + i * 50, t);
@@ -162,11 +165,14 @@ class GamatotoState extends MusicBeatState
 
 		windowTitle = new FlxText(0, 20, 300, Gamatoto.curAd.name, 28);
 		windowTitle.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
+		t.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
+		windowTitle.antialiasing = ClientPrefs.data.antialiasing;
 		curWindow.addItemAt(0, 20, windowTitle);
 
 		var t:FlxText = new FlxText(0, 0, 300, "", 24);
 		t.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
 		t.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
+		t.antialiasing = ClientPrefs.data.antialiasing;
 		curWindow.addItem("screenCenter", t);
 		windowTexts.push(t);
 	}
