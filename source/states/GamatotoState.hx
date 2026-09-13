@@ -165,7 +165,7 @@ class GamatotoState extends MusicBeatState
 
 		windowTitle = new FlxText(0, 20, 300, Gamatoto.curAd.name, 28);
 		windowTitle.setFormat(Paths.font("vcr.ttf"), 28, FlxColor.WHITE, CENTER);
-		t.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
+		windowTitle.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 5, 1);
 		windowTitle.antialiasing = ClientPrefs.data.antialiasing;
 		curWindow.addItemAt(0, 20, windowTitle);
 
