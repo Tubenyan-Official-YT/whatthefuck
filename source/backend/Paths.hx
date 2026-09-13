@@ -299,7 +299,9 @@ class Paths
 
 	inline static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
-		var path:String = getPath(key, TEXT, !ignoreMods);
+		var translatedKey:String = Language.getFileTranslation(key);
+		var path:String = getPath(translatedKey, TEXT, !ignoreMods);
+
 		#if sys
 		return (FileSystem.exists(path)) ? File.getContent(path) : null;
 		#else
